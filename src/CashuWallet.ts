@@ -1,6 +1,6 @@
 import { bytesToHex, randomBytes } from '@noble/hashes/utils';
-import { CashuMint } from './CashuMint.js';
-import { BlindedMessage } from './model/BlindedMessage.js';
+import { CashuMint } from './CashuMint';
+import { BlindedMessage } from './model/BlindedMessage';
 import {
 	type AmountPreference,
 	type BlindedMessageData,
@@ -20,7 +20,7 @@ import {
 	type TokenEntry,
 	CheckStateEnum,
 	SerializedBlindedSignature
-} from './model/types/index.js';
+} from './model/types/index';
 import {
 	bytesToNumber,
 	getDecodedToken,
@@ -134,8 +134,8 @@ class CashuWallet {
 				privkey: options?.privkey
 			});
 			return proofs;
-		} catch (error) {
-			throw new Error('Error when receiving');
+		} catch (error: any) {
+			throw new Error('Error when receiving: ' + error.message);
 		}
 	}
 
@@ -183,8 +183,8 @@ class CashuWallet {
 				keys
 			);
 			proofs.push(...newProofs);
-		} catch (error) {
-			throw new Error('Error receiving token entry');
+		} catch (error: any) {
+			throw new Error('Error receiving token entry: ' + error.message);
 		}
 		return proofs;
 	}
@@ -306,7 +306,7 @@ class CashuWallet {
 	/**
 	 * Initialize the wallet with the mints public keys
 	 */
-	private async getKeys(keysetId?: string, unit?: string): Promise<MintKeys> {
+	async getKeys(keysetId?: string, unit?: string): Promise<MintKeys> {
 		if (!this._keys || (keysetId !== undefined && this._keys.id !== keysetId)) {
 			const allKeys = await this.mint.getKeys(keysetId);
 			let keys;
@@ -577,7 +577,7 @@ class CashuWallet {
 	 * @param proofs (only the 'Y' field is required)
 	 * @returns
 	 */
-	async checkProofsSpent<T extends { secret: string }>(proofs: Array<T>): Promise<Array<T>> {
+	async checkProofsSpent<T extends { secret: string }>(proofs: Array<T>): Promise<{spent: Array<T>, pending: Array<T>}> {
 		const enc = new TextEncoder();
 		const Ys = proofs.map((p) => hashToCurve(enc.encode(p.secret)).toHex(true));
 		const payload = {
@@ -586,11 +586,19 @@ class CashuWallet {
 		};
 		const { states } = await this.mint.check(payload);
 
-		return proofs.filter((_, i) => {
+		const spent = proofs.filter((_, i) => {
 			const state = states.find((state) => state.Y === Ys[i]);
 			return state && state.state === CheckStateEnum.SPENT;
 		});
+
+		const pending = proofs.filter((_, i) => {
+			const state = states.find((state) => state.Y === Ys[i]);
+			return state && state.state === CheckStateEnum.PENDING;
+		});
+
+		return {spent, pending}
 	}
+	
 	private splitReceive(
 		amount: number,
 		amountAvailable: number

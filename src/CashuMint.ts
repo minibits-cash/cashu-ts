@@ -17,9 +17,9 @@ import type {
 	PostRestorePayload,
 	MeltQuotePayload,
 	MeltQuoteResponse
-} from './model/types/index.js';
-import request from './request.js';
-import { isObj, joinUrls, sanitizeUrl } from './utils.js';
+} from './model/types/index';
+import request from './request';
+import { isObj, joinUrls, sanitizeUrl } from './utils';
 
 /**
  * Class represents Cashu Mint API. This class contains Lower level functions that are implemented by CashuWallet.
