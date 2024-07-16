@@ -482,7 +482,7 @@ export type GetInfoResponse = {
 	version: string;
 	description?: string;
 	description_long?: string;
-	contact: Array<[string, string]>;
+	contact: Array<[string, string]> & Array<{method: string, info: string}>;
 	nuts: {
 		'4': {
 			methods: Array<SwapMethod>;

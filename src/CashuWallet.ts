@@ -26,7 +26,7 @@ import {
 	getDecodedToken,
 	getDefaultAmountPreference,
 	splitAmount
-} from './utils.js';
+} from './utils';
 import { validateMnemonic } from '@scure/bip39';
 import { wordlist } from '@scure/bip39/wordlists/english';
 import { hashToCurve, pointFromHex } from '@cashu/crypto/modules/common';
