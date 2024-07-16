@@ -485,6 +485,13 @@ export type NUT15Entry = {
 	mpp: boolean 
 }
 
+/** Websockets NUT entry */
+export type NUT17Entry = {
+	method: string,
+	unit: string,
+	commands: string[]
+}
+
 /**
  * Response from mint at /info endpoint
  */
@@ -519,7 +526,8 @@ export type GetInfoResponse = {
 		'13'?: {
 			supported: boolean;
 		};
-		'15'?: NUT15Entry[]
+		'15'?: NUT15Entry[],
+		'17'?: { supported?: NUT17Entry[] }
 	};
 	motd?: string;
 };
