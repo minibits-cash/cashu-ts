@@ -519,7 +519,7 @@ export type GetInfoResponse = {
 		'13'?: {
 			supported: boolean;
 		};
-		'15'?: NUT15Entry
+		'15'?: NUT15Entry[]
 	};
 	motd?: string;
 };
