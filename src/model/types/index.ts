@@ -473,6 +473,18 @@ export type BlindedMessageData = {
 	rs: Array<bigint>;
 };
 
+/** core NUT4(mint)/5(melt) entry  */
+export type CoreNUTEntry = {
+	methods: SwapMethod[];
+	disabled: boolean;
+}
+/** Partial multi-path payments NUT entry */
+export type NUT15Entry = { 
+	method: string, 
+	unit: string, 
+	mpp: boolean 
+}
+
 /**
  * Response from mint at /info endpoint
  */
@@ -484,14 +496,8 @@ export type GetInfoResponse = {
 	description_long?: string;
 	contact: Array<[string, string]> & Array<{method: string, info: string}>;
 	nuts: {
-		'4': {
-			methods: Array<SwapMethod>;
-			disabled: boolean;
-		};
-		'5': {
-			methods: Array<SwapMethod>;
-			disabled: boolean;
-		};
+		'4': CoreNUTEntry;
+		'5': CoreNUTEntry;
 		'7'?: {
 			supported: boolean;
 		};
@@ -513,6 +519,7 @@ export type GetInfoResponse = {
 		'13'?: {
 			supported: boolean;
 		};
+		'15'?: NUT15Entry
 	};
 	motd?: string;
 };
