@@ -357,9 +357,6 @@ export type CheckStateEntry = {
  * Response when checking proofs if they are spendable. Should not rely on this for receiving, since it can be easily cheated.
  */
 export type CheckStateResponse = {
-	/**
-	 *
-	 */
 	states: Array<CheckStateEntry>;
 } & ApiError;
 /**
@@ -435,6 +432,66 @@ export type TokenV2 = {
 	proofs: Array<Proof>;
 	mints: Array<{ url: string; ids: Array<string> }>;
 };
+
+export type TokenV4DLEQProof = {
+	e: Uint8Array,
+	s: Uint8Array,
+	r: Uint8Array
+}
+
+export type TokenV4Proof = {
+	/** amount */
+	a: number,
+	/** secret */
+	s: string,
+	/** signature */
+	c: Uint8Array,
+	/** DLEQ proof */
+	d?: TokenV4DLEQProof,
+	/** witness */
+	w?: string
+}
+
+export type TokenV4Entry = {
+	/** keyset id */
+	i: Uint8Array
+	/** proofs */
+	p: TokenV4Proof[]
+}
+
+/** 
+ * new token format (v4)
+ * @see https://github.com/cashubtc/nuts/blob/main/00.md#v4-tokens
+ */
+export type TokenV4 = {
+	/** mint url */
+	m: string;
+	/** unit */
+	u: string;
+	/** memo */
+	d?: string;
+	/** tokens */
+	t: TokenV4Entry[]
+}
+
+// hexed variants
+
+export type HexedTokenV4Proof = Omit<TokenV4Proof, 'c'> & {
+	/** hex representation of signature */
+	c: string,
+}
+
+export type HexedTokenV4Entry = Omit<TokenV4Entry, 'i'> & {
+	/** hex representation of keyset id */
+	i: string,
+	/** proofs */
+	p: HexedTokenV4Proof[]
+}
+
+export type HexedTokenV4 = TokenV4 & {
+	/** tokens with hex representations instead of Uint8Arrays */
+	t: HexedTokenV4Entry[]
+}
 
 /**
  * Data that the library needs to hold in memory while it awaits the blinded signatures for the mint. It is later used for unblinding the signatures.

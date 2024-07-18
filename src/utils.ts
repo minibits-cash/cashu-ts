@@ -1,5 +1,5 @@
 import { encodeBase64ToJson, encodeBase64toUint8, encodeJsonToBase64 } from './base64.js';
-import { AmountPreference, Keys, Proof, Token, TokenEntry, TokenV2 } from './model/types/index.js';
+import { AmountPreference, Keys, Proof, Token, TokenEntry, TokenV2, TokenV4 } from './model/types/index.js';
 import { TOKEN_PREFIX, TOKEN_VERSION } from './utils/Constants.js';
 import { bytesToHex, hexToBytes } from '@noble/curves/abstract/utils';
 import { sha256 } from '@noble/hashes/sha256';
@@ -77,6 +77,10 @@ function getEncodedToken(token: Token): string {
 	return TOKEN_PREFIX + TOKEN_VERSION + encodeJsonToBase64(token);
 }
 
+function getEncodedTokenV4(token: TokenV4): string {
+	throw new Error('Not implemented yet');
+}
+
 /**
  * Helper function to decode cashu tokens into object
  * @param token an encoded cashu token (cashuAey...)
@@ -105,11 +109,7 @@ function handleTokens(token: string): Token {
 		return encodeBase64ToJson<Token>(encodedToken);
 	} else if (version === 'B') {
 		const uInt8Token = encodeBase64toUint8(encodedToken);
-		const tokenData = decodeCBOR(uInt8Token) as {
-			t: { p: { a: number; s: string; c: Uint8Array }[]; i: Uint8Array }[];
-			m: string;
-			d: string;
-		};
+		const tokenData = decodeCBOR(uInt8Token) as TokenV4;
 		const mergedTokenEntry: TokenEntry = { mint: tokenData.m, proofs: [] };
 		tokenData.t.forEach((tokenEntry) =>
 			tokenEntry.p.forEach((p) => {

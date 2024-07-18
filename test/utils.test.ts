@@ -1,6 +1,9 @@
-import { AmountPreference, Token } from '../src/model/types/index.js';
-import * as utils from '../src/utils.js';
-import { PUBKEYS } from './consts.js';
+import { AmountPreference, HexedTokenV4, HexedTokenV4Entry, Token, TokenV4 } from '../src/model/types/index';
+import * as utils from '../src/utils';
+import { decodeCBOR, encodeCBOR } from '../src/cbor';
+import { PUBKEYS } from './consts';
+import { bytesToHex, hexToBytes as h } from '@noble/hashes/utils';
+import { base64urlFromBase64, encodeBase64ToJson, encodeBase64toUint8, encodeUint8toBase64 } from '../src/base64';
 
 describe('test split amounts ', () => {
 	test('testing amount 2561', async () => {
@@ -43,7 +46,7 @@ describe('test split custom amounts ', () => {
 	});
 });
 
-describe('test decode token', () => {
+describe('test decode token v1 v2', () => {
 	test('testing v1 Token', () => {
 		const token =
 			'W3siaWQiOiIwTkkzVFVBczFTZnkiLCJhbW91bnQiOjIsInNlY3JldCI6Ild6ZC9vNUVHdmVKb3hTQVlGcjZ1U3lnUmFWSUFrOFc4MXNLTlRxdVd4UjQ9IiwiQyI6IjAzNWNiZmQwOTNiOWZlMWRjNjU2MGEwNDM3YzQyNDQxZjA0ZDIyYzk4MDY2NGMyNGExMGZlZGFiNTlmZWY0YmZjOSJ9LHsiaWQiOiIwTkkzVFVBczFTZnkiLCJhbW91bnQiOjQsInNlY3JldCI6InU0N2lWUkhneUNuUFhCNWxOdFpGaTBOeHpPZ1lyRk1WODV2aFpyRThIbWM9IiwiQyI6IjAyNThiYmZkZWJmZGQzYjk0OTljZDk1YzFkMWZiYTVjZTQ1MWFjOGNlZTE0NzM1Yzk2MGFiMDc1ZmI2ZTQ4ZjBkYyJ9LHsiaWQiOiIwTkkzVFVBczFTZnkiLCJhbW91bnQiOjY0LCJzZWNyZXQiOiJ1YTFaT0hjeVB3T0M0UUxPaWthQVV1MThJM2pEUDJCSVNYREFGcW91N1VNPSIsIkMiOiIwMjU2MWNhNjcyNTdlNzdhNjNjN2U3NWQ4MGVkYTI3ZDlhMmEyYzUxZTA0NGM4ZjhmODVlNzc0OTZlMGRlM2U2NWIifSx7ImlkIjoiME5JM1RVQXMxU2Z5IiwiYW1vdW50IjoxLCJzZWNyZXQiOiJ5ZTlNRCtaQ25VUHlHOTBscmYyZ2tudnA3N2I4V05wNUxRT2ZtcERjRGNFPSIsIkMiOiIwM2UwN2M1NjExNzcwMmNmODg3MDFlYjAyOTM2YjA5MDNhZmEyMTQwZDcwNTY1N2ZkODVkM2YxZWI5MzRiYTBjYzMifSx7ImlkIjoiME5JM1RVQXMxU2Z5IiwiYW1vdW50IjoyLCJzZWNyZXQiOiJIUHpzRmZPUDFWRU1BMW8vTnFHVXFhRXdaV2RiN3VERzM4T1grLzlZTURzPSIsIkMiOiIwMmQ3ZDE1YTBhZmIyNThjMjlhZDdmOWY4N2ZmMzIxZWRmNTgyOTM0ZWI0NWExNTE2MjhiNTJjMDExZjQ2MWZkOGEifSx7ImlkIjoiME5JM1RVQXMxU2Z5IiwiYW1vdW50IjoxLCJzZWNyZXQiOiJnMVR1YXdha1RVQkJBTW9tZGpDVHkrRENNTnBaUmd3dWluNXB5V2xoTVVNPSIsIkMiOiIwMzU4Y2IxMGE5NWEzY2E1YmE5MTc5MTllMWNhODA1NjZmMTg5NTI4Njk1MTJjYWFjMDlmYmQ5MGYxN2QyZTZlYmEifSx7ImlkIjoiME5JM1RVQXMxU2Z5IiwiYW1vdW50IjoyLCJzZWNyZXQiOiJRMTFyamNXWk55Q2dkRmxqRThaNkdwNFhDYllKcndzRGhncXVQOTU1VWU0PSIsIkMiOiIwMjAxNjBmODIwNGU4MGIxNDg4NmFlMzZjMzRiMjI3ODllMzMxZmM5MjVhNGMwOGE3ZWYxZDZjYzMyYTIwNjZjZWUifSx7ImlkIjoiME5JM1RVQXMxU2Z5IiwiYW1vdW50Ijo4LCJzZWNyZXQiOiI1MVZrUXFYT2kwM0k2a0pzM0tlSEI0OVVCQTFSRktrWnMyMFljZEtOSW1JPSIsIkMiOiIwMjZiYWU2YTgzOWE3OTdjNmU5NGZlNGM5MWZlNTIwOGU4MDE3MTg2Y2NkMDk0ZmI4ZTNkZjYyNjAyZWJmMjczMjUifSx7ImlkIjoiME5JM1RVQXMxU2Z5IiwiYW1vdW50IjoxNiwic2VjcmV0IjoiVk4ySlMwUENKdGQ3MjJUTXUxdGFxNUZSMXg0dDlXM28xNndWRGVweXBxYz0iLCJDIjoiMDIxMmM4ZGE5NWE4NDEyYjgyMDE4MTgxNzQxZWY1YWQ0ZjYzMTU1NjBhMWFmODM5ZjMxOTU4NTcwZTVlYzI2ZDQyIn1d';
@@ -64,7 +67,7 @@ describe('test decode token', () => {
 	});
 });
 
-describe('test decode token', () => {
+describe('test decode token v3 v4', () => {
 	test('testing v3 Token', async () => {
 		const obj = {
 			token: [
@@ -173,7 +176,70 @@ describe('test decode token', () => {
 		const result = utils.getDecodedToken(token);
 		expect(result).toStrictEqual(v3Token);
 	});
+	test('decode v4 specification token', async () => {
+		const encodedToken = `cashuBo2F0gqJhaUgA_9SLj17PgGFwgaNhYQFhc3hAYWNjMTI0MzVlN2I4NDg0YzNjZjE4NTAxNDkyMThhZjkwZjcxNmE1MmJmNGE1ZWQzNDdlNDhlY2MxM2Y3NzM4OGFjWCECRFODGd5IXVW-07KaZCvuWHk3WrnnpiDhHki6SCQh88-iYWlIAK0mjE0fWCZhcIKjYWECYXN4QDEzMjNkM2Q0NzA3YTU4YWQyZTIzYWRhNGU5ZjFmNDlmNWE1YjRhYzdiNzA4ZWIwZDYxZjczOGY0ODMwN2U4ZWVhY1ghAjRWqhENhLSsdHrr2Cw7AFrKUL9Ffr1XN6RBT6w659lNo2FhAWFzeEA1NmJjYmNiYjdjYzY0MDZiM2ZhNWQ1N2QyMTc0ZjRlZmY4YjQ0MDJiMTc2OTI2ZDNhNTdkM2MzZGNiYjU5ZDU3YWNYIQJzEpxXGeWZN5qXSmJjY8MzxWyvwObQGr5G1YCCgHicY2FtdWh0dHA6Ly9sb2NhbGhvc3Q6MzMzOGF1Y3NhdA==`
+
+		const noPrefix = encodedToken.slice(6)
+		const decodeduint = encodeBase64toUint8(noPrefix)
+		const dt = decodeCBOR(decodeduint) as TokenV4
+		const hexedCBOR: HexedTokenV4 = { m: dt.m, u: dt.u, t: [] }
+
+		for (const token of dt.t) {
+			const hexedToken: HexedTokenV4Entry = { i: bytesToHex(token.i), p: [] }
+
+			for (const proof of token.p) {
+				const hexedProof = { a: proof.a, s: proof.s, c: bytesToHex(proof.c) }
+				hexedToken.p.push(hexedProof)
+			}
+			hexedCBOR.t.push(hexedToken)
+		}
+		// this works
+
+		console.log(JSON.stringify(hexedCBOR, null, 2))
+		// console.log(JSON.stringify(dt, null, 2))
+	})
 });
+
+describe('test encode token v4', () => {
+	test('encode v4 token', async () => {
+		const token: TokenV4 = {
+			t: [
+				{
+					i: h('00ffd48b8f5ecf80'),
+					p: [
+						{
+							a: 1,
+							s: "acc12435e7b8484c3cf1850149218af90f716a52bf4a5ed347e48ecc13f77388",
+							c: h('0244538319de485d55bed3b29a642bee5879375ab9e7a620e11e48ba482421f3cf')
+						}
+					]
+				},
+				{
+					"i": h('00ad268c4d1f5826'),
+					"p": [
+							{
+									"a": 2,
+									"s": "1323d3d4707a58ad2e23ada4e9f1f49f5a5b4ac7b708eb0d61f738f48307e8ee",
+									"c": h('023456aa110d84b4ac747aebd82c3b005aca50bf457ebd5737a4414fac3ae7d94d'),
+							},
+							{
+									"a": 1,
+									"s": "56bcbcbb7cc6406b3fa5d57d2174f4eff8b4402b176926d3a57d3c3dcbb59d57",
+									"c": h('0273129c5719e599379a974a626363c333c56cafc0e6d01abe46d5808280789c63'),
+							},
+					],
+			},
+			],
+			m: 'http://localhost:3338',
+			u: 'sat'
+		} 
+		const cbor = encodeCBOR(token);
+		const b64 = encodeUint8toBase64(cbor)
+		const b64_url = base64urlFromBase64(b64)
+		const prefixed = 'cashuB' + b64_url
+		console.log(prefixed)
+	})
+})
 
 describe('test keyset derivation', () => {
 	test('derive', () => {
