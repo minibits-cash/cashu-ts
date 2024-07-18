@@ -1,6 +1,6 @@
 {
 	"name": "@cashu/cashu-ts",
-	"version": "1.0.0-rc.9-minibits",
+	"version": "1.0.0-rc.12-minibits",
 	"description": "cashu library for communicating with a cashu mint",
 	"main": "src/index.ts",	
 	"repository": {
@@ -17,6 +17,7 @@
 		"dev": "tsc --watch",
 		"lint": "eslint --ext .js,.ts . --fix",
 		"format": "prettier --write .",
+		"check-format": "prettier --check .",
 		"typedoc": "typedoc src/index.ts"
 	},
 	"keywords": [
