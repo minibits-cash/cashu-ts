@@ -482,10 +482,10 @@ export type CoreNUTEntry = {
 	disabled: boolean;
 }
 /** Partial multi-path payments NUT entry */
-export type NUT15Entry = { 
-	method: string, 
-	unit: string, 
-	mpp: boolean 
+export type NUT15Entry = {
+	method: string,
+	unit: string,
+	mpp: boolean
 }
 
 /** Websockets NUT entry */
@@ -494,6 +494,13 @@ export type NUT17Entry = {
 	unit: string,
 	commands: string[]
 }
+
+/** @deprecated please use MintContactInfo after Nutshell 0.16.0*/
+export type LegacyContactInfo = [string, string]
+export type MintContactInfo = {
+	method: string;
+	info: string;
+};
 
 /**
  * Response from mint at /info endpoint
@@ -504,7 +511,7 @@ export type GetInfoResponse = {
 	version: string;
 	description?: string;
 	description_long?: string;
-	contact: Array<[string, string]> & Array<{method: string, info: string}>;
+	contact: LegacyContactInfo[] | MintContactInfo[];
 	nuts: {
 		'4': CoreNUTEntry;
 		'5': CoreNUTEntry;
