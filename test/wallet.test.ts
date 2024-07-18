@@ -180,14 +180,16 @@ describe('receive', () => {
 		nock(mintUrl).post('/v1/swap').reply(400, { detail: msg });
 		const wallet = new CashuWallet(mint, { unit });
 		const result = await wallet.receive(tokenInput).catch((e) => e);
-		expect(result).toEqual(new Error('Error when receiving'));
+		expect(result).toBeInstanceOf(Error);
+		expect(result.message.startsWith('Error when receiving')).toBe(true);
 	});
 
 	test('test receive could not verify proofs', async () => {
 		nock(mintUrl).post('/v1/swap').reply(400, { code: 0, error: 'could not verify proofs.' });
 		const wallet = new CashuWallet(mint, { unit });
 		const result = await wallet.receive(tokenInput).catch((e) => e);
-		expect(result).toEqual(new Error('Error when receiving'));
+		expect(result).toBeInstanceOf(Error);
+		expect(result.message.startsWith('Error when receiving')).toBe(true);
 	});
 });
 
@@ -208,7 +210,7 @@ describe('checkProofsSpent', () => {
 
 		const result = await wallet.checkProofsSpent(proofs);
 
-		expect(result).toStrictEqual([]);
+		expect(result).toEqual({ spent: [], pending: [] });
 	});
 });
 
