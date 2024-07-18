@@ -77,9 +77,9 @@ function getEncodedToken(token: Token): string {
 	return TOKEN_PREFIX + TOKEN_VERSION + encodeJsonToBase64(token);
 }
 
-function getEncodedTokenV4(token: TokenV4): string {
-	throw new Error('Not implemented yet');
-}
+// function getEncodedTokenV4(token: TokenV4): string {
+// 	throw new Error('Not implemented yet');
+// }
 
 /**
  * Helper function to decode cashu tokens into object

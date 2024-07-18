@@ -2,8 +2,9 @@ import { AmountPreference, HexedTokenV4, HexedTokenV4Entry, Token, TokenV4 } fro
 import * as utils from '../src/utils';
 import { decodeCBOR, encodeCBOR } from '../src/cbor';
 import { PUBKEYS } from './consts';
-import { bytesToHex, hexToBytes as h } from '@noble/hashes/utils';
+import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
 import { base64urlFromBase64, encodeBase64ToJson, encodeBase64toUint8, encodeUint8toBase64 } from '../src/base64';
+import diff from 'microdiff';
 
 describe('test split amounts ', () => {
 	test('testing amount 2561', async () => {
@@ -176,69 +177,92 @@ describe('test decode token v3 v4', () => {
 		const result = utils.getDecodedToken(token);
 		expect(result).toStrictEqual(v3Token);
 	});
-	test('decode v4 specification token', async () => {
-		const encodedToken = `cashuBo2F0gqJhaUgA_9SLj17PgGFwgaNhYQFhc3hAYWNjMTI0MzVlN2I4NDg0YzNjZjE4NTAxNDkyMThhZjkwZjcxNmE1MmJmNGE1ZWQzNDdlNDhlY2MxM2Y3NzM4OGFjWCECRFODGd5IXVW-07KaZCvuWHk3WrnnpiDhHki6SCQh88-iYWlIAK0mjE0fWCZhcIKjYWECYXN4QDEzMjNkM2Q0NzA3YTU4YWQyZTIzYWRhNGU5ZjFmNDlmNWE1YjRhYzdiNzA4ZWIwZDYxZjczOGY0ODMwN2U4ZWVhY1ghAjRWqhENhLSsdHrr2Cw7AFrKUL9Ffr1XN6RBT6w659lNo2FhAWFzeEA1NmJjYmNiYjdjYzY0MDZiM2ZhNWQ1N2QyMTc0ZjRlZmY4YjQ0MDJiMTc2OTI2ZDNhNTdkM2MzZGNiYjU5ZDU3YWNYIQJzEpxXGeWZN5qXSmJjY8MzxWyvwObQGr5G1YCCgHicY2FtdWh0dHA6Ly9sb2NhbGhvc3Q6MzMzOGF1Y3NhdA==`
 
-		const noPrefix = encodedToken.slice(6)
-		const decodeduint = encodeBase64toUint8(noPrefix)
-		const dt = decodeCBOR(decodeduint) as TokenV4
-		const hexedCBOR: HexedTokenV4 = { m: dt.m, u: dt.u, t: [] }
+	// test('decode v4 specification token', async () => {
+	// 	const encodedToken = `cashuBo2F0gqJhaUgA_9SLj17PgGFwgaNhYQFhc3hAYWNjMTI0MzVlN2I4NDg0YzNjZjE4NTAxNDkyMThhZjkwZjcxNmE1MmJmNGE1ZWQzNDdlNDhlY2MxM2Y3NzM4OGFjWCECRFODGd5IXVW-07KaZCvuWHk3WrnnpiDhHki6SCQh88-iYWlIAK0mjE0fWCZhcIKjYWECYXN4QDEzMjNkM2Q0NzA3YTU4YWQyZTIzYWRhNGU5ZjFmNDlmNWE1YjRhYzdiNzA4ZWIwZDYxZjczOGY0ODMwN2U4ZWVhY1ghAjRWqhENhLSsdHrr2Cw7AFrKUL9Ffr1XN6RBT6w659lNo2FhAWFzeEA1NmJjYmNiYjdjYzY0MDZiM2ZhNWQ1N2QyMTc0ZjRlZmY4YjQ0MDJiMTc2OTI2ZDNhNTdkM2MzZGNiYjU5ZDU3YWNYIQJzEpxXGeWZN5qXSmJjY8MzxWyvwObQGr5G1YCCgHicY2FtdWh0dHA6Ly9sb2NhbGhvc3Q6MzMzOGF1Y3NhdA==`
 
-		for (const token of dt.t) {
-			const hexedToken: HexedTokenV4Entry = { i: bytesToHex(token.i), p: [] }
+		
+	// 	// this works
 
-			for (const proof of token.p) {
-				const hexedProof = { a: proof.a, s: proof.s, c: bytesToHex(proof.c) }
-				hexedToken.p.push(hexedProof)
-			}
-			hexedCBOR.t.push(hexedToken)
-		}
-		// this works
-
-		console.log(JSON.stringify(hexedCBOR, null, 2))
-		// console.log(JSON.stringify(dt, null, 2))
-	})
+	// 	// console.log(JSON.stringify(hexedCBOR, null, 2))
+	// 	// console.log(JSON.stringify(dt, null, 2))
+	// })
 });
 
-describe('test encode token v4', () => {
-	test('encode v4 token', async () => {
-		const token: TokenV4 = {
-			t: [
-				{
-					i: h('00ffd48b8f5ecf80'),
-					p: [
-						{
-							a: 1,
-							s: "acc12435e7b8484c3cf1850149218af90f716a52bf4a5ed347e48ecc13f77388",
-							c: h('0244538319de485d55bed3b29a642bee5879375ab9e7a620e11e48ba482421f3cf')
-						}
-					]
-				},
-				{
-					"i": h('00ad268c4d1f5826'),
-					"p": [
-							{
-									"a": 2,
-									"s": "1323d3d4707a58ad2e23ada4e9f1f49f5a5b4ac7b708eb0d61f738f48307e8ee",
-									"c": h('023456aa110d84b4ac747aebd82c3b005aca50bf457ebd5737a4414fac3ae7d94d'),
-							},
-							{
-									"a": 1,
-									"s": "56bcbcbb7cc6406b3fa5d57d2174f4eff8b4402b176926d3a57d3c3dcbb59d57",
-									"c": h('0273129c5719e599379a974a626363c333c56cafc0e6d01abe46d5808280789c63'),
-							},
-					],
+function encodeV4Token(tokenTBE: TokenV4) {
+	const cbor = encodeCBOR(tokenTBE);
+	const b64 = encodeUint8toBase64(cbor)
+	const b64_url = base64urlFromBase64(b64)
+	const prefixed = 'cashuB' + b64_url
+	return prefixed
+}
+
+function decodeV4Token(encodedToken: string) {
+	const noPrefix = encodedToken.slice(6)
+	const decodeduint = encodeBase64toUint8(noPrefix)
+	const dt = decodeCBOR(decodeduint) as TokenV4
+	return dt;
+}
+
+/** swap Uint8Arrays for hex strings */
+function hexTokenObject(tokenObj: TokenV4) {
+	const hexedCBOR: HexedTokenV4 = { m: tokenObj.m, u: tokenObj.u, t: [] }
+
+	for (const token of tokenObj.t) {
+		const hexedToken: HexedTokenV4Entry = { i: bytesToHex(token.i), p: [] }
+
+		for (const proof of token.p) {
+			const hexedProof = { a: proof.a, s: proof.s, c: bytesToHex(proof.c) }
+			hexedToken.p.push(hexedProof)
+		}
+		hexedCBOR.t.push(hexedToken)
+	}
+	return hexedCBOR
+}
+
+describe('test encode & decode token v4 sync up', () => {
+	const tokenTBE: TokenV4 = {
+		t: [
+			{
+				i: hexToBytes('00ffd48b8f5ecf80'),
+				p: [
+					{
+						a: 1,
+						s: "acc12435e7b8484c3cf1850149218af90f716a52bf4a5ed347e48ecc13f77388",
+						c: hexToBytes('0244538319de485d55bed3b29a642bee5879375ab9e7a620e11e48ba482421f3cf')
+					}
+				]
 			},
-			],
-			m: 'http://localhost:3338',
-			u: 'sat'
-		} 
-		const cbor = encodeCBOR(token);
-		const b64 = encodeUint8toBase64(cbor)
-		const b64_url = base64urlFromBase64(b64)
-		const prefixed = 'cashuB' + b64_url
-		console.log(prefixed)
+			{
+				"i": hexToBytes('00ad268c4d1f5826'),
+				"p": [
+						{
+							"a": 2,
+							"s": "1323d3d4707a58ad2e23ada4e9f1f49f5a5b4ac7b708eb0d61f738f48307e8ee",
+							"c": hexToBytes('023456aa110d84b4ac747aebd82c3b005aca50bf457ebd5737a4414fac3ae7d94d'),
+						},
+						{
+							"a": 1,
+							"s": "56bcbcbb7cc6406b3fa5d57d2174f4eff8b4402b176926d3a57d3c3dcbb59d57",
+							"c": hexToBytes('0273129c5719e599379a974a626363c333c56cafc0e6d01abe46d5808280789c63'),
+						},
+				],
+			},
+		],
+		m: 'http://localhost:3338',
+		u: 'sat'
+	}
+
+	test('decoded v4 token is the same as the one we want to encode', async () => {
+		const decodedToken = decodeV4Token(`cashuBo2F0gqJhaUgA_9SLj17PgGFwgaNhYQFhc3hAYWNjMTI0MzVlN2I4NDg0YzNjZjE4NTAxNDkyMThhZjkwZjcxNmE1MmJmNGE1ZWQzNDdlNDhlY2MxM2Y3NzM4OGFjWCECRFODGd5IXVW-07KaZCvuWHk3WrnnpiDhHki6SCQh88-iYWlIAK0mjE0fWCZhcIKjYWECYXN4QDEzMjNkM2Q0NzA3YTU4YWQyZTIzYWRhNGU5ZjFmNDlmNWE1YjRhYzdiNzA4ZWIwZDYxZjczOGY0ODMwN2U4ZWVhY1ghAjRWqhENhLSsdHrr2Cw7AFrKUL9Ffr1XN6RBT6w659lNo2FhAWFzeEA1NmJjYmNiYjdjYzY0MDZiM2ZhNWQ1N2QyMTc0ZjRlZmY4YjQ0MDJiMTc2OTI2ZDNhNTdkM2MzZGNiYjU5ZDU3YWNYIQJzEpxXGeWZN5qXSmJjY8MzxWyvwObQGr5G1YCCgHicY2FtdWh0dHA6Ly9sb2NhbGhvc3Q6MzMzOGF1Y3NhdA==`)
+	
+		console.log(diff(tokenTBE, decodedToken))
+		expect(tokenTBE).toStrictEqual(decodedToken)
 	})
+
+	// test('encode v4 token', async () => {
+	// 	console.log(encodeV4Token(tokenTBE))
+	// })
 })
 
 describe('test keyset derivation', () => {

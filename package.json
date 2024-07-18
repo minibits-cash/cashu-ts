@@ -2,7 +2,7 @@
 	"name": "@cashu/cashu-ts",
 	"version": "1.0.0-rc.12-minibits",
 	"description": "cashu library for communicating with a cashu mint",
-	"main": "src/index.ts",	
+	"main": "src/index.ts",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/cashubtc/cashu-ts"
@@ -52,6 +52,7 @@
 		"@noble/hashes": "^1.3.3",
 		"@scure/bip32": "^1.3.3",
 		"@scure/bip39": "^1.2.2",
-		"buffer": "^6.0.3"
+		"buffer": "^6.0.3",
+		"microdiff": "^1.4.0"
 	}
 }
