@@ -1,6 +1,8 @@
 import { AmountPreference, HexedTokenV4, HexedTokenV4Entry, Token, TokenV4 } from '../src/model/types/index';
 import * as utils from '../src/utils';
 import { decodeCBOR, encodeCBOR } from '../src/cbor';
+// import { decode as decodeCBOR, encode as encodeCBOR } from 'cborg';
+// import { decode, encode } from 'cborg';
 import { PUBKEYS } from './consts';
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
 import { base64urlFromBase64, encodeBase64ToJson, encodeBase64toUint8, encodeUint8toBase64 } from '../src/base64';
@@ -258,12 +260,6 @@ describe('test encode & decode token v4 sync up', () => {
 	}
 	const encodedExample = `cashuBo2F0gqJhaUgA_9SLj17PgGFwgaNhYQFhc3hAYWNjMTI0MzVlN2I4NDg0YzNjZjE4NTAxNDkyMThhZjkwZjcxNmE1MmJmNGE1ZWQzNDdlNDhlY2MxM2Y3NzM4OGFjWCECRFODGd5IXVW-07KaZCvuWHk3WrnnpiDhHki6SCQh88-iYWlIAK0mjE0fWCZhcIKjYWECYXN4QDEzMjNkM2Q0NzA3YTU4YWQyZTIzYWRhNGU5ZjFmNDlmNWE1YjRhYzdiNzA4ZWIwZDYxZjczOGY0ODMwN2U4ZWVhY1ghAjRWqhENhLSsdHrr2Cw7AFrKUL9Ffr1XN6RBT6w659lNo2FhAWFzeEA1NmJjYmNiYjdjYzY0MDZiM2ZhNWQ1N2QyMTc0ZjRlZmY4YjQ0MDJiMTc2OTI2ZDNhNTdkM2MzZGNiYjU5ZDU3YWNYIQJzEpxXGeWZN5qXSmJjY8MzxWyvwObQGr5G1YCCgHicY2FtdWh0dHA6Ly9sb2NhbGhvc3Q6MzMzOGF1Y3NhdA==`
 
-	test('decoded v4 token is the same as tokenTBE (spec)', async () => {
-		const decodedToken = decodeV4Token(encodedExample)
-	
-		expect(tokenTBE).toStrictEqual(decodedToken)
-	})
-
 	test('CBOR of tokenTBE (spec) is the same as cbor of encodedExample', async () => {
 		const cbor_tokenTBE = encodeCBOR(tokenTBE);
 		const cbor_encodedExample = encodeBase64toUint8(encodedExample.slice(6))
@@ -276,6 +272,12 @@ describe('test encode & decode token v4 sync up', () => {
 		)
 
 		expect(cbor_tokenTBE).toStrictEqual(cbor_encodedExample)
+	})
+
+	test('decoded v4 token is the same as tokenTBE (spec)', async () => {
+		const decodedToken = decodeV4Token(encodedExample)
+	
+		expect(tokenTBE).toStrictEqual(decodedToken)
 	})
 
 	test('encoded tokenTBE (spec) is what it should be', async () => {
