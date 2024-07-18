@@ -19,7 +19,7 @@ import type {
 	MintContactInfo
 } from './model/types/index';
 import { MeltQuoteState } from './model/types/index';
-import request from './request.js';
+import request from './request';
 import { isObj, joinUrls, sanitizeUrl } from './utils';
 import {
 	MeltQuoteResponsePaidDeprecated,
