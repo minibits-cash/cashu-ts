@@ -4,7 +4,6 @@ import { decodeCBOR, encodeCBOR } from '../src/cbor';
 import { PUBKEYS } from './consts';
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
 import { base64urlFromBase64, encodeBase64ToJson, encodeBase64toUint8, encodeUint8toBase64 } from '../src/base64';
-import diff from 'microdiff';
 
 describe('test split amounts ', () => {
 	test('testing amount 2561', async () => {
@@ -221,6 +220,11 @@ function hexTokenObject(tokenObj: TokenV4) {
 }
 
 describe('test encode & decode token v4 sync up', () => {
+
+	/** 
+	 * example token object from the spec 
+	 @see https://github.com/cashubtc/nuts/blob/main/00.md#v4-tokens
+	*/
 	const tokenTBE: TokenV4 = {
 		t: [
 			{
@@ -252,17 +256,32 @@ describe('test encode & decode token v4 sync up', () => {
 		m: 'http://localhost:3338',
 		u: 'sat'
 	}
+	const encodedExample = `cashuBo2F0gqJhaUgA_9SLj17PgGFwgaNhYQFhc3hAYWNjMTI0MzVlN2I4NDg0YzNjZjE4NTAxNDkyMThhZjkwZjcxNmE1MmJmNGE1ZWQzNDdlNDhlY2MxM2Y3NzM4OGFjWCECRFODGd5IXVW-07KaZCvuWHk3WrnnpiDhHki6SCQh88-iYWlIAK0mjE0fWCZhcIKjYWECYXN4QDEzMjNkM2Q0NzA3YTU4YWQyZTIzYWRhNGU5ZjFmNDlmNWE1YjRhYzdiNzA4ZWIwZDYxZjczOGY0ODMwN2U4ZWVhY1ghAjRWqhENhLSsdHrr2Cw7AFrKUL9Ffr1XN6RBT6w659lNo2FhAWFzeEA1NmJjYmNiYjdjYzY0MDZiM2ZhNWQ1N2QyMTc0ZjRlZmY4YjQ0MDJiMTc2OTI2ZDNhNTdkM2MzZGNiYjU5ZDU3YWNYIQJzEpxXGeWZN5qXSmJjY8MzxWyvwObQGr5G1YCCgHicY2FtdWh0dHA6Ly9sb2NhbGhvc3Q6MzMzOGF1Y3NhdA==`
 
-	test('decoded v4 token is the same as the one we want to encode', async () => {
-		const decodedToken = decodeV4Token(`cashuBo2F0gqJhaUgA_9SLj17PgGFwgaNhYQFhc3hAYWNjMTI0MzVlN2I4NDg0YzNjZjE4NTAxNDkyMThhZjkwZjcxNmE1MmJmNGE1ZWQzNDdlNDhlY2MxM2Y3NzM4OGFjWCECRFODGd5IXVW-07KaZCvuWHk3WrnnpiDhHki6SCQh88-iYWlIAK0mjE0fWCZhcIKjYWECYXN4QDEzMjNkM2Q0NzA3YTU4YWQyZTIzYWRhNGU5ZjFmNDlmNWE1YjRhYzdiNzA4ZWIwZDYxZjczOGY0ODMwN2U4ZWVhY1ghAjRWqhENhLSsdHrr2Cw7AFrKUL9Ffr1XN6RBT6w659lNo2FhAWFzeEA1NmJjYmNiYjdjYzY0MDZiM2ZhNWQ1N2QyMTc0ZjRlZmY4YjQ0MDJiMTc2OTI2ZDNhNTdkM2MzZGNiYjU5ZDU3YWNYIQJzEpxXGeWZN5qXSmJjY8MzxWyvwObQGr5G1YCCgHicY2FtdWh0dHA6Ly9sb2NhbGhvc3Q6MzMzOGF1Y3NhdA==`)
+	test('decoded v4 token is the same as tokenTBE (spec)', async () => {
+		const decodedToken = decodeV4Token(encodedExample)
 	
-		console.log(diff(tokenTBE, decodedToken))
 		expect(tokenTBE).toStrictEqual(decodedToken)
 	})
 
-	// test('encode v4 token', async () => {
-	// 	console.log(encodeV4Token(tokenTBE))
-	// })
+	test('CBOR of tokenTBE (spec) is the same as cbor of encodedExample', async () => {
+		const cbor_tokenTBE = encodeCBOR(tokenTBE);
+		const cbor_encodedExample = encodeBase64toUint8(encodedExample.slice(6))
+
+		console.log(
+			'cbor_tokenTBE', 
+			cbor_tokenTBE.length, 
+			'cbor_encodedExample',
+			cbor_encodedExample.length
+		)
+
+		expect(cbor_tokenTBE).toStrictEqual(cbor_encodedExample)
+	})
+
+	test('encoded tokenTBE (spec) is what it should be', async () => {
+		const encodedToken = encodeV4Token(tokenTBE)
+		expect(encodedToken).toBe(encodedExample)
+	})
 })
 
 describe('test keyset derivation', () => {
