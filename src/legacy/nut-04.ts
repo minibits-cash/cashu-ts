@@ -1,5 +1,5 @@
-import type { MintQuoteResponse } from '../model/types/index.js';
-import { MintQuoteState } from '../model/types/index.js';
+import type { MintQuoteResponse } from '../model/types/index';
+import { MintQuoteState } from '../model/types/index';
 
 export type MintQuoteResponsePaidDeprecated = {
 	paid?: boolean;
