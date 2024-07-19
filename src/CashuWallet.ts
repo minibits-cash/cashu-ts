@@ -21,7 +21,7 @@ import {
 	CheckStateEnum,
 	SerializedBlindedSignature,
 	MeltQuoteState
-} from './model/types/index.js';
+} from './model/types/index';
 import {
 	bytesToNumber,
 	getDecodedToken,
