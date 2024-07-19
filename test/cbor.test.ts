@@ -473,8 +473,8 @@ const tests = [
 describe('cbor decoder', () => {
 	test.each(tests)('given $hex as arguments, returns $decoded', ({ hex, decoded }) => {
 		const res = decodeCBOR(Buffer.from(hex, 'hex'));
-		console.log(decoded);
-		console.log(res);
+		// console.log(decoded);
+		// console.log(res);
 		expect(res).toEqual(decoded);
 	});
 });
@@ -482,7 +482,22 @@ describe('cbor decoder', () => {
 describe('cbor encoder', () => {
 	test.each(encoderTests)('give $decoded as argument, return $hex', ({ hex, decoded }) => {
 		const res = encodeCBOR(decoded);
-		console.log(res);
+		// console.log(res);
+		expect(res).toEqual(Uint8Array.from(Buffer.from(hex, 'hex')));
+	});
+});
+
+// warning: i'm not exactly sure what's the difference between the encoderTests and tests, so these might be useless
+describe('cbor encode -> decoder symmetry', () => {
+	test.each(encoderTests)('give $decoded as argument, return $hex', ({ hex, decoded }) => {
+		const res = decodeCBOR(encodeCBOR(decoded));
+		expect(res).toEqual(decoded);
+	});
+});
+
+describe('cbor decode -> encoder symmetry', () => {
+	test.each(tests)('given $hex as arguments, returns $decoded', ({ hex, decoded }) => {
+		const res = encodeCBOR(decodeCBOR(Buffer.from(hex, 'hex')));
 		expect(res).toEqual(Uint8Array.from(Buffer.from(hex, 'hex')));
 	});
 });
