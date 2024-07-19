@@ -2,7 +2,7 @@
 	"name": "@cashu/cashu-ts",
 	"version": "1.0.0-minibits",
 	"description": "cashu library for communicating with a cashu mint",
-	"main": "src/index.ts",	
+	"main": "src/index.ts",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/cashubtc/cashu-ts"
@@ -14,6 +14,8 @@
 		"compile": "rm -rf dist/lib && tsc && tsc --build tsconfig.es5.json",
 		"test": "jest --coverage --testPathIgnorePatterns ./test/integration.test.ts",
 		"test-integration": "jest --coverage --testPathPattern ./test/integration.test.ts",
+		"test:utils": "jest --coverage --testPathPattern ./test/utils.test.ts",
+		"test:cbor": "jest --coverage --testPathPattern ./test/cbor.test.ts",
 		"dev": "tsc --watch",
 		"lint": "eslint --ext .js,.ts . --fix",
 		"format": "prettier --write .",

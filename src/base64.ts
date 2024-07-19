@@ -29,4 +29,4 @@ function base64urlFromBase64(str: string) {
 	// .replace(/=/g, '.');
 }
 
-export { encodeUint8toBase64, encodeBase64toUint8, encodeJsonToBase64, encodeBase64ToJson };
+export { encodeUint8toBase64, encodeBase64toUint8, encodeJsonToBase64, encodeBase64ToJson, base64urlToBase64, base64urlFromBase64 };
