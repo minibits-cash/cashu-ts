@@ -122,6 +122,7 @@ class CashuWallet {
 	 */
 	async receive(
 		token: string | Token,
+		fee: number,
 		options?: {
 			keysetId?: string;
 			preference?: Array<AmountPreference>;
@@ -135,7 +136,7 @@ class CashuWallet {
 				token = getDecodedToken(token);
 			}
 			const tokenEntries: Array<TokenEntry> = token.token;
-			const proofs = await this.receiveTokenEntry(tokenEntries[0], {
+			const proofs = await this.receiveTokenEntry(tokenEntries[0], fee, {
 				keysetId: options?.keysetId,
 				preference: options?.preference,
 				counter: options?.counter,
@@ -159,14 +160,16 @@ class CashuWallet {
 	 */
 	async receiveTokenEntry(
 		tokenEntry: TokenEntry,
+		fee: number,
 		options?: {
 			keysetId?: string;
 			preference?: Array<AmountPreference>;
 			counter?: number;
 			pubkey?: string;
 			privkey?: string;
+			fee?: number;
 		}
-	): Promise<Array<Proof>> {
+	): Promise<Array<Proof>> {		
 		const proofs: Array<Proof> = [];
 		try {
 			const amount = tokenEntry.proofs.reduce((total, curr) => total + curr.amount, 0);
@@ -177,6 +180,7 @@ class CashuWallet {
 			const keys = await this.getKeys(options?.keysetId);
 			const { payload, blindedMessages } = this.createSwapPayload(
 				amount,
+				fee,
 				tokenEntry.proofs,
 				keys,
 				preference,
@@ -212,15 +216,16 @@ class CashuWallet {
 	 */
 	async send(
 		amount: number,
+		fee: number,
 		proofs: Array<Proof>,
 		options?: {
 			preference?: Array<AmountPreference>;
 			counter?: number;
 			pubkey?: string;
 			privkey?: string;
-			keysetId?: string;
+			keysetId?: string;			
 		}
-	): Promise<SendResponse> {
+	): Promise<SendResponse> {			
 		if (options?.preference) {
 			amount = options?.preference?.reduce((acc, curr) => acc + curr.amount * curr.count, 0);
 		}
@@ -239,17 +244,19 @@ class CashuWallet {
 
 		if (amount > amountAvailable) {
 			throw new Error('Not enough funds available');
-		}
+		}		
+		
 		if (amount < amountAvailable || options?.preference || options?.pubkey) {
 			const { amountKeep, amountSend } = this.splitReceive(amount, amountAvailable);
 			const { payload, blindedMessages } = this.createSwapPayload(
 				amountSend,
+				fee,
 				proofsToSend,
 				keyset,
 				options?.preference,
 				options?.counter,
 				options?.pubkey,
-				options?.privkey
+				options?.privkey,				
 			);
 			const { signatures } = await this.mint.split(payload);
 			const proofs = this.constructProofs(
@@ -263,7 +270,7 @@ class CashuWallet {
 			const splitProofsToSend: Array<Proof> = [];
 			let amountKeepCounter = 0;
 			proofs.forEach((proof) => {
-				if (amountKeepCounter < amountKeep) {
+				if (amountKeepCounter < amountKeep - fee) {
 					amountKeepCounter += proof.amount;
 					splitProofsToKeep.push(proof);
 					return;
@@ -523,19 +530,22 @@ class CashuWallet {
 	 */
 	private createSwapPayload(
 		amount: number,
+		fee: number,
 		proofsToSend: Array<Proof>,
 		keyset: MintKeys,
 		preference?: Array<AmountPreference>,
 		counter?: number,
 		pubkey?: string,
-		privkey?: string
+		privkey?: string,		
 	): {
 		payload: SwapPayload;
 		blindedMessages: BlindedTransaction;
 	} {
 		const totalAmount = proofsToSend.reduce((total, curr) => total + curr.amount, 0);
+		const keepAmount = totalAmount > amount ? Math.max(0, totalAmount - amount - fee) : 0
+		const sendAmount = keepAmount === 0 ? amount - fee : amount
 		const keepBlindedMessages = this.createRandomBlindedMessages(
-			totalAmount - amount,
+			keepAmount,
 			keyset.id,
 			undefined,
 			counter
@@ -544,7 +554,7 @@ class CashuWallet {
 			counter = counter + keepBlindedMessages.secrets.length;
 		}
 		const sendBlindedMessages = this.createRandomBlindedMessages(
-			amount,
+			sendAmount,
 			keyset.id,
 			preference,
 			counter,
@@ -621,7 +631,7 @@ class CashuWallet {
 	 * Creates blinded messages for a given amount
 	 * @param amount amount to create blinded messages for
 	 * @param amountPreference optional preference for splitting proofs into specific amounts. overrides amount param
-	 * @param keyksetId? override the keysetId derived from the current mintKeys with a custom one. This should be a keyset that was fetched from the `/keysets` endpoint
+	 * @param keysetId? override the keysetId derived from the current mintKeys with a custom one. This should be a keyset that was fetched from the `/keysets` endpoint
 	 * @param counter? optionally set counter to derive secret deterministically. CashuWallet class must be initialized with seed phrase to take effect
 	 * @param pubkey? optionally locks ecash to pubkey. Will not be deterministic, even if counter is set!
 	 * @returns blinded messages, secrets, rs, and amounts
@@ -641,7 +651,7 @@ class CashuWallet {
 	 * Creates blinded messages for a according to @param amounts
 	 * @param amount array of amounts to create blinded messages for
 	 * @param counter? optionally set counter to derive secret deterministically. CashuWallet class must be initialized with seed phrase to take effect
-	 * @param keyksetId? override the keysetId derived from the current mintKeys with a custom one. This should be a keyset that was fetched from the `/keysets` endpoint
+	 * @param keysetId? override the keysetId derived from the current mintKeys with a custom one. This should be a keyset that was fetched from the `/keysets` endpoint
 	 * @param pubkey? optionally locks ecash to pubkey. Will not be deterministic, even if counter is set!
 	 * @returns blinded messages, secrets, rs, and amounts
 	 */
