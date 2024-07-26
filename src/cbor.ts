@@ -34,7 +34,19 @@ function encodeUnsigned(value: number, buffer: Array<number>) {
 	} else if (value < 4294967296) {
 		buffer.push(0x1a, value >> 24, (value >> 16) & 0xff, (value >> 8) & 0xff, value & 0xff);
 	} else {
-		throw new Error('Unsupported integer size');
+		const hi = Math.floor(value / 0x100000000);
+		const lo = value >>> 0;
+		buffer.push(
+			0x1b,
+			hi >> 24,
+			(hi >> 16) & 0xff,
+			(hi >> 8) & 0xff,
+			hi & 0xff,
+			lo >> 24,
+			(lo >> 16) & 0xff,
+			(lo >> 8) & 0xff,
+			lo & 0xff
+		);
 	}
 }
 
@@ -45,9 +57,17 @@ function encodeString(value: string, buffer: Array<number>) {
 	utf8.forEach((b) => buffer.push(b));
 }
 
-function encodeArray(value: Array<any>, buffer: Array<number>) {
-	encodeUnsigned(value.length, buffer);
-	buffer[buffer.length - 1] |= 0x80;
+function encodeArray(value: Array<any>, buffer: Array<number>): void {
+	const length = value.length;
+	if (length < 24) {
+		buffer.push(0x80 | length);
+	} else if (length < 256) {
+		buffer.push(0x98, length);
+	} else if (length < 65536) {
+		buffer.push(0x99, length >> 8, length & 0xff);
+	} else {
+		buffer.push(0x9a, length >> 24, (length >> 16) & 0xff, (length >> 8) & 0xff, length & 0xff);
+	}
 	for (const item of value) {
 		encodeItem(item, buffer);
 	}
