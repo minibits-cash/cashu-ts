@@ -1,10 +1,14 @@
 import { AmountPreference, HexedTokenV4, HexedTokenV4Entry, Token, TokenV4, TokenV4Entry } from '../src/model/types/index';
 import * as utils from '../src/utils';
-import { decodeCBOR, encodeCBOR } from '../src/cbor';
+// import { decodeCBOR, encodeCBOR } from '../src/cbor';
+import { CBOR } from 'cbor-redux';
 import { PUBKEYS } from './consts';
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
 import { base64urlFromBase64, encodeBase64ToJson, encodeBase64toUint8, encodeJsonToBase64, encodeUint8toBase64 } from '../src/base64';
 // import diff from 'microdiff';
+
+const encodeCBOR = CBOR.encode
+const decodeCBOR = CBOR.decode
 
 describe('test split amounts ', () => {
 	test('testing amount 2561', async () => {
@@ -190,7 +194,7 @@ describe('test decode token v3 v4', () => {
 });
 
 function encodeV4Token(tokenTBE: TokenV4) {
-	const cbor = encodeCBOR(tokenTBE);
+	const cbor = new Uint8Array(encodeCBOR(tokenTBE));
 	const b64 = encodeUint8toBase64(cbor)
 	const b64_url = base64urlFromBase64(b64)
 	const prefixed = 'cashuB' + b64_url
@@ -200,7 +204,9 @@ function encodeV4Token(tokenTBE: TokenV4) {
 function decodeV4Token(encodedToken: string) {
 	const noPrefix = encodedToken.slice(6) // base64url
 	const decodeduint = encodeBase64toUint8(noPrefix) // uint8array
-	const dt = decodeCBOR(decodeduint) as TokenV4 // TokenV4 object
+	console.log(decodeduint)
+	const dt = decodeCBOR(decodeduint.buffer) as TokenV4
+	console.log(decodeduint, dt)
 	return dt;
 }
 
@@ -284,6 +290,22 @@ describe('test encode & decode token v4 sync up', () => {
 		// console.log('microdiff', diff(tokenTBE, result))
 		expect(tokenTBE).toEqual(result)
 	})
+	
+	test('cbor representations equal: CBOR of tokenTBE (spec) is the same as cbor of encodedExample', async () => {
+		const cbor_tokenTBE = new Uint8Array(encodeCBOR(tokenTBE))
+		const cbor_encodedExample = encodeBase64toUint8(encodedExample.slice(6))
+
+		console.log(
+			'cbor_tokenTBE', 
+			cbor_tokenTBE.length, 
+			typeof cbor_tokenTBE, Object.keys(cbor_tokenTBE),
+			'cbor_encodedExample',
+			cbor_encodedExample.length,
+			typeof cbor_encodedExample, Object.keys(cbor_encodedExample)
+		)
+
+		expect(cbor_tokenTBE).toEqual(cbor_encodedExample)
+	})
 
 	// test('token v4 encode is symmetric to token v4decode', async () => {
 	// 	const result = decodeV4Token(encodeV4Token(tokenTBE));
@@ -292,21 +314,6 @@ describe('test encode & decode token v4 sync up', () => {
 	// })
 
 
-	// test('cbor representations equal: CBOR of tokenTBE (spec) is the same as cbor of encodedExample', async () => {
-	// 	const cbor_tokenTBE = encodeCBOR(tokenTBE)
-	// 	const cbor_encodedExample = encodeBase64toUint8(encodedExample.slice(6))
-
-	// 	console.log(
-	// 		'cbor_tokenTBE', 
-	// 		cbor_tokenTBE.length, 
-	// 		typeof cbor_tokenTBE, Object.keys(cbor_tokenTBE),
-	// 		'cbor_encodedExample',
-	// 		cbor_encodedExample.length,
-	// 		typeof cbor_encodedExample, Object.keys(cbor_encodedExample)
-	// 	)
-
-	// 	expect(cbor_tokenTBE).toEqual(cbor_encodedExample)
-	// })
 
 	test('encoded tokenTBE (spec) is what it should be', async () => {
 		const encodedToken = encodeV4Token(tokenTBE)
