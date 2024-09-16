@@ -1,6 +1,6 @@
 {
 	"name": "@cashu/cashu-ts",
-	"version": "1.0.0-minibits.4",
+	"version": "1.0.0-minibits.5",
 	"description": "cashu library for communicating with a cashu mint",
 	"main": "src/index.ts",	
 	"repository": {
