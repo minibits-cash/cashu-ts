@@ -670,6 +670,9 @@ class CashuWallet {
 		const blindedMessages: Array<SerializedBlindedMessage> = [];
 		const secrets: Array<Uint8Array> = [];
 		const rs: Array<bigint> = [];
+
+		const start = performance.now()
+
 		for (let i = 0; i < amounts.length; i++) {
 			let deterministicR = undefined;
 			let secretBytes = undefined;
@@ -691,6 +694,10 @@ class CashuWallet {
 			const blindedMessage = new BlindedMessage(amounts[i], B_, keysetId);
 			blindedMessages.push(blindedMessage.getSerializedBlindedMessage());
 		}
+
+		const end = performance.now()
+		console.log(`[createBlindedMessages] createBlindedMessages took ${end - start} ms.`)
+		
 		return { blindedMessages, secrets, rs, amounts };
 	}
 
