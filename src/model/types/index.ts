@@ -279,6 +279,10 @@ export type MintQuotePayload = {
 	 * Amount to be minted
 	 */
 	amount: number;
+	/**
+	 * Description to be included into the invoice
+	 */
+	description: string;
 };
 
 export enum MintQuoteState {
