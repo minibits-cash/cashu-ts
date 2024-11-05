@@ -15,7 +15,7 @@
 <li><a href="../modules.html">@cashu/cashu-ts</a></li>
 <li><a href="MeltTokensResponse.html">MeltTokensResponse</a></li></ul>
 <h1>Type alias MeltTokensResponse</h1></div>
-<div class="tsd-signature"><span class="tsd-kind-type-alias">Melt<wbr/>Tokens<wbr/>Response</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">change</span><span class="tsd-signature-symbol">: </span><a href="Proof.html" class="tsd-signature-type tsd-kind-type-alias">Proof</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">isPaid</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">preimage</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span></div>
+<div class="tsd-signature"><span class="tsd-kind-type-alias">Melt<wbr/>Tokens<wbr/>Response</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">change</span><span class="tsd-signature-symbol">: </span><a href="Proof.html" class="tsd-signature-type tsd-kind-type-alias">Proof</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">preimage</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">state</span><span class="tsd-signature-symbol">: </span><a href="../enums/MeltQuoteState.html" class="tsd-signature-type tsd-kind-enum">MeltQuoteState</a><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span></div>
 <div class="tsd-comment tsd-typography"><p>Response after paying a Lightning invoice</p>
 </div>
 <div class="tsd-type-declaration">
@@ -27,18 +27,18 @@
 </div>
 <div class="tsd-comment tsd-typography"></div></li>
 <li class="tsd-parameter">
-<h5><span class="tsd-kind-property">is<wbr/>Paid</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></h5>
-<div class="tsd-comment tsd-typography"><p>if false, the proofs have not been invalidated and the payment can be tried later again with the same proofs</p>
+<h5><span class="tsd-kind-property">preimage</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h5>
+<div class="tsd-comment tsd-typography"><p>preimage of the paid invoice. can be null, depending on which LN-backend the mint uses</p>
 </div>
 <div class="tsd-comment tsd-typography"></div></li>
 <li class="tsd-parameter">
-<h5><span class="tsd-kind-property">preimage</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h5>
-<div class="tsd-comment tsd-typography"><p>preimage of the paid invoice. can be null, depending on which LN-backend the mint uses</p>
+<h5><span class="tsd-kind-property">state</span><span class="tsd-signature-symbol">: </span><a href="../enums/MeltQuoteState.html" class="tsd-signature-type tsd-kind-enum">MeltQuoteState</a></h5>
+<div class="tsd-comment tsd-typography"><p>Melt state</p>
 </div>
 <div class="tsd-comment tsd-typography"></div></li></ul></div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/minibits-cash/cashu-ts/blob/08a5476/src/model/types/index.ts#L214">src/model/types/index.ts:214</a></li></ul></aside></div>
+<li>Defined in <a href="https://github.com/minibits-cash/cashu-ts/blob/1a60b78/src/model/types/index.ts#L214">src/model/types/index.ts:214</a></li></ul></aside></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
