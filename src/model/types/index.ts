@@ -213,9 +213,9 @@ export type MeltPayload = {
  */
 export type MeltTokensResponse = {
 	/**
-	 * if false, the proofs have not been invalidated and the payment can be tried later again with the same proofs
+	 * Melt state
 	 */
-	isPaid: boolean;
+	state: MeltQuoteState;
 	/**
 	 * preimage of the paid invoice. can be null, depending on which LN-backend the mint uses
 	 */
