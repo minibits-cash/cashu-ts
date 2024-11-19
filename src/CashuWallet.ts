@@ -26,7 +26,8 @@ import {
 	bytesToNumber,
 	getDecodedToken,
 	getDefaultAmountPreference,
-	splitAmount
+	splitAmount,
+	sumProofs
 } from './utils';
 import { validateMnemonic } from '@scure/bip39';
 import { wordlist } from '@scure/bip39/wordlists/english';
@@ -443,7 +444,7 @@ class CashuWallet {
 		const keys = await this.getKeys(options?.keysetId);
 
 		const { blindedMessages, secrets, rs } = this.createBlankOutputs(
-			meltQuote.fee_reserve,
+			sumProofs(proofsToSend) - meltQuote.amount,
 			keys.id,
 			options?.counter
 		);
@@ -462,6 +463,8 @@ class CashuWallet {
 				: []
 		};
 	}
+
+
 
 	/**
 	 * Helper function that pays a Lightning invoice directly without having to create a melt quote before

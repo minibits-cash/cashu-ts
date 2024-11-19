@@ -4,6 +4,9 @@ import { TOKEN_PREFIX, TOKEN_VERSION } from './utils/Constants';
 import { bytesToHex, hexToBytes } from '@noble/curves/abstract/utils';
 import { sha256 } from '@noble/hashes/sha256';
 
+export function sumProofs(proofs: Array<Proof>) {
+	return proofs.reduce((acc: number, proof: Proof) => acc + proof.amount, 0);
+}
 
 function splitAmount(value: number, amountPreference?: Array<AmountPreference>): Array<number> {
 	const chunks: Array<number> = [];
