@@ -1,16 +1,16 @@
-import { CashuMint } from './CashuMint.js';
-import { CashuWallet } from './CashuWallet.js';
-import { PaymentRequest } from './model/PaymentRequest.js';
-import { setGlobalRequestOptions } from './request.js';
+import { CashuMint } from './CashuMint';
+import { CashuWallet } from './CashuWallet';
+import { PaymentRequest } from './model/PaymentRequest';
+import { setGlobalRequestOptions } from './request';
 import {
 	getEncodedToken,
 	getEncodedTokenV4,
 	getDecodedToken,
 	deriveKeysetId,
 	decodePaymentRequest
-} from './utils.js';
+} from './utils';
 
-export * from './model/types/index.js';
+export * from './model/types/index';
 
 export {
 	CashuMint,
@@ -24,4 +24,4 @@ export {
 	setGlobalRequestOptions
 };
 
-export { injectWebSocketImpl } from './ws.js';
+export { injectWebSocketImpl } from './ws';
