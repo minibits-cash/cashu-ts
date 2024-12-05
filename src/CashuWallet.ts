@@ -146,7 +146,7 @@ class CashuWallet {
 			});
 			return proofs;
 		} catch (error: any) {
-			throw new Error('Error when receiving: ' + error.message);
+			throw new Error('Receive failed: ' + error.message);
 		}
 	}
 
@@ -171,35 +171,32 @@ class CashuWallet {
 			fee?: number;
 		}
 	): Promise<Array<Proof>> {		
-		const proofs: Array<Proof> = [];
-		try {
-			const amount = tokenEntry.proofs.reduce((total, curr) => total + curr.amount, 0);
-			let preference = options?.preference;
-			if (!preference) {
-				preference = getDefaultAmountPreference(amount);
-			}
-			const keys = await this.getKeys(options?.keysetId);
-			const { payload, blindedMessages } = this.createSwapPayload(
-				amount,
-				fee,
-				tokenEntry.proofs,
-				keys,
-				preference,
-				options?.counter,
-				options?.pubkey,
-				options?.privkey
-			);
-			const { signatures } = await CashuMint.split(tokenEntry.mint, payload);
-			const newProofs = this.constructProofs(
-				signatures,
-				blindedMessages.rs,
-				blindedMessages.secrets,
-				keys
-			);
-			proofs.push(...newProofs);
-		} catch (error: any) {
-			throw new Error('Error receiving token entry: ' + error.message);
+		const proofs: Array<Proof> = [];		
+		const amount = tokenEntry.proofs.reduce((total, curr) => total + curr.amount, 0);
+		let preference = options?.preference;
+		if (!preference) {
+			preference = getDefaultAmountPreference(amount);
 		}
+		const keys = await this.getKeys(options?.keysetId);
+		const { payload, blindedMessages } = this.createSwapPayload(
+			amount,
+			fee,
+			tokenEntry.proofs,
+			keys,
+			preference,
+			options?.counter,
+			options?.pubkey,
+			options?.privkey
+		);
+		const { signatures } = await CashuMint.split(tokenEntry.mint, payload);
+		const newProofs = this.constructProofs(
+			signatures,
+			blindedMessages.rs,
+			blindedMessages.secrets,
+			keys
+		);
+		proofs.push(...newProofs);
+
 		return proofs;
 	}
 
