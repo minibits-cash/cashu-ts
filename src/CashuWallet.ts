@@ -43,7 +43,7 @@ import {
 } from '@cashu/crypto/modules/client';
 import { deriveBlindingFactor, deriveSecret } from '@cashu/crypto/modules/client/NUT09';
 import { createP2PKsecret, getSignedProofs } from '@cashu/crypto/modules/client/NUT11';
-import { type Proof as NUT11Proof, DLEQ } from '@cashu/crypto/modules/common/index';
+// import { type Proof as NUT11Proof, DLEQ } from '@cashu/crypto/modules/common/index';
 import { SubscriptionCanceller } from './model/types/wallet/websocket';
 import { verifyDLEQProof_reblind } from '@cashu/crypto/modules/client/NUT12';
 /**
@@ -780,7 +780,7 @@ class CashuWallet {
 					};
 				}),
 				options.privkey
-			).map((p: NUT11Proof) => serializeProof(p));
+			).map((p: any) => serializeProof(p));
 		}
 
 		proofsToSend = stripDleq(proofsToSend);
@@ -857,7 +857,7 @@ class CashuWallet {
 					};
 				}),
 				privkey
-			).map((p: NUT11Proof) => serializeProof(p));
+			).map((p: any) => serializeProof(p));
 		}
 
 		proofsToSend = stripDleq(proofsToSend);
@@ -1158,7 +1158,7 @@ class CashuWallet {
 							s: hexToBytes(p.dleq.s),
 							e: hexToBytes(p.dleq.e),
 							r: rs[i]
-					  } as DLEQ);
+					  } as any);
 			const blindSignature = {
 				id: p.id,
 				amount: p.amount,
