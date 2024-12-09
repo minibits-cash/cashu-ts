@@ -2,7 +2,8 @@
 	"name": "@cashu/cashu-ts",
 	"version": "2.0.0-minibits.1",
 	"description": "cashu library for communicating with a cashu mint",
-	"main": "src/index.ts",	
+	"main": "dist/lib/es5/index.js",
+	"module": "dist/lib/es6/index.js",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/cashubtc/cashu-ts"
