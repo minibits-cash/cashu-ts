@@ -727,9 +727,21 @@ class CashuWallet {
 	 * @param quote ID of the melt quote
 	 * @returns the mint will return an existing melt quote
 	 */
-	async checkMeltQuote(quote: string): Promise<MeltQuoteResponse> {
+	async checkMeltQuote(quote: string): Promise<{quote: MeltQuoteResponse, change: Proof[]}> {
 		const meltQuote = await this.mint.checkMeltQuote(quote);
-		return meltQuote;
+		let change: Proof[] = []
+
+		if (meltQuote.change && meltQuote.change.length > 0) {
+			const keys = await this.getKeys();
+			const amount = meltQuote.change.reduce((acc: number, sig: SerializedBlindedSignature) => acc + sig.amount, 0);
+			const { blindedMessages, secrets, blindingFactors } = this.createBlankOutputs(
+				amount,
+				keys.id,				
+			);
+			let change: Array<Proof> = [];
+			change = this.constructProofs(meltQuote.change, blindingFactors, secrets, keys);
+		}
+		return {quote: meltQuote, change};
 	}
 
 	/**
