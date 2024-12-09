@@ -3,7 +3,7 @@ import {
 	encodeBase64toUint8,
 	encodeJsonToBase64,
 	encodeUint8toBase64Url
-} from './base64.js';
+} from './base64';
 import {
 	DeprecatedToken,
 	Keys,
@@ -15,12 +15,12 @@ import {
 	V4DLEQTemplate,
 	V4InnerToken,
 	V4ProofTemplate
-} from './model/types/index.js';
-import { TOKEN_PREFIX, TOKEN_VERSION } from './utils/Constants.js';
+} from './model/types/index';
+import { TOKEN_PREFIX, TOKEN_VERSION } from './utils/Constants';
 import { bytesToHex, hexToBytes } from '@noble/curves/abstract/utils';
 import { sha256 } from '@noble/hashes/sha256';
-import { decodeCBOR, encodeCBOR } from './cbor.js';
-import { PaymentRequest } from './model/PaymentRequest.js';
+import { decodeCBOR, encodeCBOR } from './cbor';
+import { PaymentRequest } from './model/PaymentRequest';
 import { DLEQ, pointFromHex } from '@cashu/crypto/modules/common';
 import { verifyDLEQProof_reblind } from '@cashu/crypto/modules/client/NUT12';
 
