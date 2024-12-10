@@ -23,7 +23,8 @@ import {
 	MintQuoteResponse,
 	MintQuoteState,
 	MeltQuoteState,
-	SerializedDLEQ
+	SerializedDLEQ,
+	CheckStateEnum
 } from './model/types/index';
 import {
 	bytesToNumber,
@@ -875,7 +876,10 @@ class CashuWallet {
 	 * @param proofs (only the `secret` field is required)
 	 * @returns
 	 */
-	async checkProofsStates(proofs: Array<Proof>): Promise<Array<ProofState>> {
+	async checkProofsStates(proofs: Array<Proof>): Promise<{
+		[CheckStateEnum: string]: Proof[]
+	}	
+	> {
 		const enc = new TextEncoder();
 		const Ys = proofs.map((p: Proof) => hashToCurve(enc.encode(p.secret)).toHex(true));
 		// TODO: Replace this with a value from the info endpoint of the mint eventually
@@ -898,7 +902,15 @@ class CashuWallet {
 				states.push(state);
 			}
 		}
-		return states;
+
+		const proofsByState = {
+			SPENT: proofs.filter(p => states.some(s => s.Y === hashToCurve(enc.encode(p.secret)).toHex(true) && s.state === CheckStateEnum.SPENT)),
+			PENDING: proofs.filter(p => states.some(s => s.Y === hashToCurve(enc.encode(p.secret)).toHex(true) && s.state === CheckStateEnum.PENDING)),
+			UNSEPNT: proofs.filter(p => states.some(s => s.Y === hashToCurve(enc.encode(p.secret)).toHex(true) && s.state === CheckStateEnum.UNSPENT))
+		}
+
+		return proofsByState;
+		
 	}
 
 	/**
