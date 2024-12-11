@@ -877,7 +877,7 @@ class CashuWallet {
 	 * @returns
 	 */
 	async checkProofsStates(proofs: Array<Proof>): Promise<{
-		[CheckStateEnum: string]: Proof[]
+		[key in CheckStateEnum]: Proof[]
 	}	
 	> {
 		const enc = new TextEncoder();
@@ -906,7 +906,7 @@ class CashuWallet {
 		const proofsByState = {
 			SPENT: proofs.filter(p => states.some(s => s.Y === hashToCurve(enc.encode(p.secret)).toHex(true) && s.state === CheckStateEnum.SPENT)),
 			PENDING: proofs.filter(p => states.some(s => s.Y === hashToCurve(enc.encode(p.secret)).toHex(true) && s.state === CheckStateEnum.PENDING)),
-			UNSEPNT: proofs.filter(p => states.some(s => s.Y === hashToCurve(enc.encode(p.secret)).toHex(true) && s.state === CheckStateEnum.UNSPENT))
+			UNSPENT: proofs.filter(p => states.some(s => s.Y === hashToCurve(enc.encode(p.secret)).toHex(true) && s.state === CheckStateEnum.UNSPENT))
 		}
 
 		return proofsByState;
