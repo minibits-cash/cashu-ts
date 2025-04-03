@@ -7,8 +7,11 @@ import {
 	getEncodedTokenV4,
 	getDecodedToken,
 	deriveKeysetId,
-	decodePaymentRequest
-} from './utils';
+	decodePaymentRequest,
+	getDecodedTokenBinary,
+	getEncodedTokenBinary,
+	hasValidDleq
+} from './utils.js';
 
 export * from './model/types/index';
 
@@ -21,7 +24,12 @@ export {
 	getEncodedTokenV4,
 	decodePaymentRequest,
 	deriveKeysetId,
-	setGlobalRequestOptions
+	setGlobalRequestOptions,
+	getDecodedTokenBinary,
+	getEncodedTokenBinary,
+	hasValidDleq
 };
 
-export { injectWebSocketImpl } from './ws';
+export { injectWebSocketImpl } from './ws.js';
+
+export { MintOperationError, NetworkError, HttpResponseError } from './model/Errors.js';
