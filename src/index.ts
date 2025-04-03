@@ -1,18 +1,27 @@
 import { CashuMint } from './CashuMint';
 import { CashuWallet } from './CashuWallet';
+import { PaymentRequest } from './model/PaymentRequest';
 import { setGlobalRequestOptions } from './request';
-import { generateNewMnemonic, deriveSeedFromMnemonic } from '@cashu/crypto/modules/client/NUT09';
-import { getEncodedToken, getDecodedToken, deriveKeysetId } from './utils';
+import {
+	getEncodedToken,
+	getEncodedTokenV4,
+	getDecodedToken,
+	deriveKeysetId,
+	decodePaymentRequest
+} from './utils';
 
 export * from './model/types/index';
 
 export {
 	CashuMint,
 	CashuWallet,
+	PaymentRequest,
 	getDecodedToken,
 	getEncodedToken,
+	getEncodedTokenV4,
+	decodePaymentRequest,
 	deriveKeysetId,
-	generateNewMnemonic,
-	deriveSeedFromMnemonic,
 	setGlobalRequestOptions
 };
+
+export { injectWebSocketImpl } from './ws';
