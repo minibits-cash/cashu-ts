@@ -11,7 +11,7 @@ import {
 	getDecodedTokenBinary,
 	getEncodedTokenBinary,
 	hasValidDleq
-} from './utils.js';
+} from './utils';
 
 export * from './model/types/index';
 
