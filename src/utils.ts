@@ -7,9 +7,9 @@ import {
 	encodeBase64toUint8,
 	encodeJsonToBase64,
 	encodeUint8toBase64Url
-} from './base64.js';
-import { decodeCBOR, encodeCBOR } from './cbor.js';
-import { PaymentRequest } from './model/PaymentRequest.js';
+} from './base64';
+import { decodeCBOR, encodeCBOR } from './cbor';
+import { PaymentRequest } from './model/PaymentRequest';
 import {
 	DeprecatedToken,
 	Keys,
@@ -21,8 +21,8 @@ import {
 	V4DLEQTemplate,
 	V4InnerToken,
 	V4ProofTemplate
-} from './model/types/index.js';
-import { TOKEN_PREFIX, TOKEN_VERSION } from './utils/Constants.js';
+} from './model/types/index';
+import { TOKEN_PREFIX, TOKEN_VERSION } from './utils/Constants';
 
 /**
  * Splits the amount into denominations of the provided @param keyset
