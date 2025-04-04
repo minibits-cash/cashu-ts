@@ -9,9 +9,9 @@ import { verifyDLEQProof_reblind } from '@cashu/crypto/modules/client/NUT12';
 import { hashToCurve, pointFromHex } from '@cashu/crypto/modules/common';
 import { DLEQ, type Proof as NUT11Proof } from '@cashu/crypto/modules/common';
 import { bytesToHex, hexToBytes, randomBytes } from '@noble/hashes/utils';
-import { CashuMint } from './CashuMint.js';
-import { BlindedMessage } from './model/BlindedMessage.js';
-import { MintInfo } from './model/MintInfo.js';
+import { CashuMint } from './CashuMint';
+import { BlindedMessage } from './model/BlindedMessage';
+import { MintInfo } from './model/MintInfo';
 import {
 	GetInfoResponse,
 	MeltProofOptions,
@@ -44,8 +44,8 @@ import {
 	MeltQuoteOptions,
 	SwapTransaction,
 	LockedMintQuoteResponse
-} from './model/types/index.js';
-import { SubscriptionCanceller } from './model/types/wallet/websocket.js';
+} from './model/types/index';
+import { SubscriptionCanceller } from './model/types/wallet/websocket';
 import {
 	bytesToNumber,
 	getDecodedToken,
@@ -55,14 +55,14 @@ import {
 	splitAmount,
 	stripDleq,
 	sumProofs
-} from './utils.js';
-import { signMintQuote } from './crypto/nut-20.js';
+} from './utils';
+import { signMintQuote } from './crypto/nut-20';
 import {
 	OutputData,
 	OutputDataFactory,
 	OutputDataLike,
 	isOutputDataFactory
-} from './model/OutputData.js';
+} from './model/OutputData';
 
 /**
  * The default number of proofs per denomination to keep in a wallet.

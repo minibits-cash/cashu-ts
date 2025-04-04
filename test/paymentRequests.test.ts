@@ -4,7 +4,7 @@ import {
 	PaymentRequest,
 	PaymentRequestTransport,
 	PaymentRequestTransportType
-} from '../src/index.js';
+} from '../src/index';
 
 describe('payment requests', () => {
 	test('encode payment requests', async () => {
