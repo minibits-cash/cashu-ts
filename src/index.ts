@@ -30,6 +30,6 @@ export {
 	hasValidDleq
 };
 
-export { injectWebSocketImpl } from './ws.js';
+export { injectWebSocketImpl } from './ws';
 
-export { MintOperationError, NetworkError, HttpResponseError } from './model/Errors.js';
+export { MintOperationError, NetworkError, HttpResponseError } from './model/Errors';
