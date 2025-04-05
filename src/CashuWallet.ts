@@ -43,7 +43,8 @@ import {
 	MPPOption,
 	MeltQuoteOptions,
 	SwapTransaction,
-	LockedMintQuoteResponse
+	LockedMintQuoteResponse,
+	CheckStateEnum
 } from './model/types/index';
 import { SubscriptionCanceller } from './model/types/wallet/websocket';
 import {
@@ -937,7 +938,6 @@ class CashuWallet {
 	 */
 	private createSwapPayload(
 		amount: number,
-		fee: number,
 		proofsToSend: Array<Proof>,
 		keyset: MintKeys,
 		outputAmounts?: OutputAmounts,
