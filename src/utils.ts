@@ -15,6 +15,7 @@ import {
 	Keys,
 	MintKeys,
 	Proof,
+	SerializedBlindedSignature,
 	SerializedDLEQ,
 	Token,
 	TokenV4Template,
@@ -23,6 +24,7 @@ import {
 	V4ProofTemplate
 } from './model/types/index';
 import { TOKEN_PREFIX, TOKEN_VERSION } from './utils/Constants';
+import { BlindedSignature } from './model/BlindedSignature';
 
 /**
  * Splits the amount into denominations of the provided @param keyset
@@ -393,6 +395,10 @@ export function sanitizeUrl(url: string): string {
 
 export function sumProofs(proofs: Array<Proof>) {
 	return proofs.reduce((acc: number, proof: Proof) => acc + proof.amount, 0);
+}
+
+export function sumBlindSignatures(sigs: Array<SerializedBlindedSignature>) {
+	return sigs.reduce((acc: number, sig: SerializedBlindedSignature) => acc + sig.amount, 0);
 }
 
 export function decodePaymentRequest(paymentRequest: string) {

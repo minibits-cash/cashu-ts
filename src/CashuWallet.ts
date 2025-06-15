@@ -55,6 +55,7 @@ import {
 	numberToHexPadded64,
 	splitAmount,
 	stripDleq,
+	sumBlindSignatures,
 	sumProofs
 } from './utils';
 import { signMintQuote } from './crypto/nut-20';
@@ -923,6 +924,26 @@ class CashuWallet {
 		return {
 			quote: meltResponse,
 			change: meltResponse.change?.map((s, i) => outputData[i].toProof(s, keys)) ?? []
+		};
+	}
+
+
+	async recoverMeltQuoteChange(
+		meltQuote: MeltQuoteResponse,
+		options?: MeltProofOptions
+	): Promise<MeltProofsResponse> {
+		const { keysetId, counter } = options || {};
+		const keys = await this.getKeys(keysetId);
+		const outputData = this.createBlankOutputs(
+			sumBlindSignatures(meltQuote.change ?? []),
+			keys,
+			counter,
+			this._keepFactory
+		);
+
+		return {
+			quote: meltQuote,
+			change: meltQuote.change?.map((s, i) => outputData[i].toProof(s, keys)) ?? []
 		};
 	}
 
