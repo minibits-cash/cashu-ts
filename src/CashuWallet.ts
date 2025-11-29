@@ -934,11 +934,15 @@ class CashuWallet {
 	): Promise<MeltProofsResponse> {
 		const { keysetId, counter } = options || {};
 		const keys = await this.getKeys(keysetId);
-		const outputData = this.createBlankOutputs(
-			sumBlindSignatures(meltQuote.change ?? []),
-			keys,
-			counter,
-			this._keepFactory
+
+		if(!this._seed || !counter || !keysetId) {
+			throw new Error('CashuWallet must be initialized with a seed and counter to use recoverMeltQuoteChange');
+		}
+
+		const amounts = meltQuote.change?.map((s) => s.amount) || [];
+
+		const outputData =  amounts.map((a, i) =>
+			OutputData.createSingleDeterministicData(a, this._seed!, counter + i, keysetId)
 		);
 
 		return {
