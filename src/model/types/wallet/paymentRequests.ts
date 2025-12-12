@@ -13,7 +13,7 @@ export type RawPaymentRequest = {
 	s?: boolean; // single use
 	m?: Array<string>; // mints
 	d?: string; // description
-	t: Array<RawTransport>; // transports
+	t?: Array<RawTransport>; // transports
 };
 
 export type PaymentRequestTransport = {

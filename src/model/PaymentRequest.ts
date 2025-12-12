@@ -10,7 +10,7 @@ import { Buffer } from 'buffer';
 
 export class PaymentRequest {
 	constructor(
-		public transport: Array<PaymentRequestTransport>,
+		public transport?: Array<PaymentRequestTransport>,
 		public id?: string,
 		public amount?: number,
 		public unit?: string,
@@ -20,9 +20,14 @@ export class PaymentRequest {
 	) {}
 
 	toRawRequest() {
-		const rawRequest: RawPaymentRequest = {
-			t: this.transport.map((t: PaymentRequestTransport) => ({ t: t.type, a: t.target, g: t.tags }))
-		};
+		const rawRequest: RawPaymentRequest = {};
+		if (this.transport) {
+			rawRequest.t = this.transport.map((t: PaymentRequestTransport) => ({
+				t: t.type,
+				a: t.target,
+				g: t.tags,
+			}));
+		}
 		if (this.id) {
 			rawRequest.i = this.id;
 		}
@@ -52,15 +57,18 @@ export class PaymentRequest {
 	}
 
 	getTransport(type: PaymentRequestTransportType) {
-		return this.transport.find((t: PaymentRequestTransport) => t.type === type);
+		return this.transport?.find((t: PaymentRequestTransport) => t.type === type);
 	}
 
 	static fromRawRequest(rawPaymentRequest: RawPaymentRequest): PaymentRequest {
-		const transports = rawPaymentRequest.t.map((t: RawTransport) => ({
-			type: t.t,
-			target: t.a,
-			tags: t.g
-		}));
+		const transports = rawPaymentRequest.t
+			? rawPaymentRequest.t.map((t: RawTransport) => ({
+					type: t.t,
+					target: t.a,
+					tags: t.g,
+				}))
+			: undefined;
+
 		return new PaymentRequest(
 			transports,
 			rawPaymentRequest.i,
@@ -68,7 +76,7 @@ export class PaymentRequest {
 			rawPaymentRequest.u,
 			rawPaymentRequest.m,
 			rawPaymentRequest.d,
-			rawPaymentRequest.s
+			rawPaymentRequest.s,
 		);
 	}
 
