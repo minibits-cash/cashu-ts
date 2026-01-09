@@ -1,22 +1,23 @@
-import { encodeBase64toUint8 } from '../base64';
-import { decodeCBOR, encodeCBOR } from '../cbor';
-import {
+import { encodeBase64toUint8, decodeCBOR, encodeCBOR, Bytes } from '../utils';
+import type {
 	RawPaymentRequest,
 	RawTransport,
+	NUT10Option,
 	PaymentRequestTransport,
-	PaymentRequestTransportType
-} from './types';
-import { Buffer } from 'buffer';
+	PaymentRequestTransportType,
+} from '../wallet/types';
 
 export class PaymentRequest {
 	constructor(
-		public transport?: Array<PaymentRequestTransport>,
+		public transport?: PaymentRequestTransport[],
 		public id?: string,
 		public amount?: number,
 		public unit?: string,
-		public mints?: Array<string>,
+		public mints?: string[],
 		public description?: string,
-		public singleUse: boolean = false
+		public singleUse: boolean = false,
+		public nut10?: NUT10Option,
+		public nut26: boolean = false,
 	) {}
 
 	toRawRequest() {
@@ -46,13 +47,23 @@ export class PaymentRequest {
 		if (this.singleUse) {
 			rawRequest.s = this.singleUse;
 		}
+		if (this.nut10) {
+			rawRequest.nut10 = {
+				k: this.nut10.kind,
+				d: this.nut10.data,
+				t: this.nut10.tags,
+			};
+		}
+		if (this.nut26) {
+			rawRequest.nut26 = this.nut26;
+		}
 		return rawRequest;
 	}
 
 	toEncodedRequest() {
 		const rawRequest: RawPaymentRequest = this.toRawRequest();
 		const data = encodeCBOR(rawRequest);
-		const encodedData = Buffer.from(data).toString('base64');
+		const encodedData = Bytes.toBase64(data);
 		return 'creq' + 'A' + encodedData;
 	}
 
@@ -68,7 +79,13 @@ export class PaymentRequest {
 					tags: t.g,
 				}))
 			: undefined;
-
+		const nut10 = rawPaymentRequest.nut10
+			? {
+					kind: rawPaymentRequest.nut10.k,
+					data: rawPaymentRequest.nut10.d,
+					tags: rawPaymentRequest.nut10.t,
+				}
+			: undefined;
 		return new PaymentRequest(
 			transports,
 			rawPaymentRequest.i,
@@ -77,6 +94,8 @@ export class PaymentRequest {
 			rawPaymentRequest.m,
 			rawPaymentRequest.d,
 			rawPaymentRequest.s,
+			nut10,
+			rawPaymentRequest.nut26,
 		);
 	}
 

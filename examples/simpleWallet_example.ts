@@ -1,15 +1,13 @@
-import { CashuMint } from '../src/CashuMint';
-import { CashuWallet } from '../src/CashuWallet';
-
 import dns from 'node:dns';
 import {
-	MeltQuoteResponse,
+	PartialMeltQuoteResponse,
 	MeltQuoteState,
 	MintQuoteResponse,
 	MintQuoteState,
 	Proof,
-	Token
-} from '../src/model/types/index';
+	Token,
+	Wallet,
+} from '../src';
 import { getEncodedTokenV4, sumProofs } from '../src/utils';
 dns.setDefaultResultOrder('ipv4first');
 
@@ -20,28 +18,25 @@ const externalInvoice =
 const mintUrl = 'http://localhost:3338';
 
 // +++++++++++++++++++++ Example of a simple wallet implementation ++++++++++++++++++
-// run the example with the following command: `npx examples/_simpleWallet.ts`
 // a local mint instance should be running on port 3338. Startup command:
 // docker run -d -p 3338:3338 --name nutshell -e MINT_LIGHTNING_BACKEND=FakeWallet -e MINT_INPUT_FEE_PPK=100 -e MINT_LISTEN_HOST=0.0.0.0 -e MINT_LISTEN_PORT=3338 -e MINT_PRIVATE_KEY=TEST_PRIVATE_KEY cashubtc/nutshell:0.16.0 poetry run mint
+// run the example with the following command: `npx tsx examples/simpleWallet_example.ts`
 
 const mintAmount = 2050;
 
 const runWalletExample = async () => {
 	try {
-		// instantiate a mint. It is used later by the CashuWallet to create api calls to the mint
-		const mint = new CashuMint(mintUrl);
-
 		// create a wallet with the keys loaded from the mint.
 		// The wallet is used as an interface for all cashu specific interactions
-		const wallet = new CashuWallet(mint);
+		const wallet = new Wallet(mintUrl);
 
-		// In order to load mint keys and other information about the mint, we should call this method
+		// In order to load mint keys and other information about the mint, we MUST call this method
 		await wallet.loadMint();
 
 		//we can store the mint information, in case we later want to initialize the wallet without requesting the mint info again.
-		const mintInfo = wallet.mintInfo;
-		const keys = wallet.keys;
-		const keysets = wallet.keysets;
+		const mintInfo = wallet.getMintInfo();
+		const keyCache = wallet.keyChain.getCache();
+		console.log(mintInfo, keyCache);
 
 		// ++++++++ Minting some ecash +++++++++++++
 
@@ -61,7 +56,7 @@ const runWalletExample = async () => {
 			// The mint will return a request, that we have to fullfil in order for the ecash to be issued.
 			// (in most cases this will be a lightning invoice that needs to be paid)
 			console.log('Requesting a mint quote for' + mintAmount + 'satoshis.');
-			const quote = await wallet.createMintQuote(mintAmount);
+			const quote = await wallet.createMintQuoteBolt11(mintAmount);
 
 			console.log('Invoice to pay, in order to fullfill the quote: ' + quote.request);
 
@@ -77,7 +72,7 @@ const runWalletExample = async () => {
 			const checkMintQuote = async (q: MintQuoteResponse) => {
 				// with this call, we can check the current status of a given quote
 				console.log('Checking the status of the quote: ' + q.quote);
-				const quote = await wallet.checkMintQuote(q.quote);
+				const quote = await wallet.checkMintQuoteBolt11(q.quote);
 				if (quote.error) {
 					console.error(quote.error, quote.code, quote.detail);
 					return;
@@ -119,8 +114,8 @@ const runWalletExample = async () => {
 			console.log(
 				`sending ${send.reduce((a, b) => a + b.amount, 0)} keeping ${keep.reduce(
 					(a, b) => a + b.amount,
-					0
-				)}`
+					0,
+				)}`,
 			);
 			// first, let's update our store with the new proofs
 			proofs = keep;
@@ -132,7 +127,7 @@ const runWalletExample = async () => {
 			// In there, we set the mint url, and proof we want to send
 			const token: Token = {
 				mint: mintUrl,
-				proofs: send
+				proofs: send,
 			};
 			// and finally, we can encode the token as a cashu string
 			const cashuString = getEncodedTokenV4(token);
@@ -168,7 +163,7 @@ const runWalletExample = async () => {
 			// Similar to the minting process, we need to create a melt quote first.
 			// For this, we let the mint know what kind of request we want to be fulfilled.
 			// Usually this would be the payment of a lightning invoice.
-			const quote = await wallet.createMeltQuote(externalInvoice);
+			const quote = await wallet.createMeltQuoteBolt11(externalInvoice);
 
 			// After creating the melt quote, we can initiate the melting process.
 			const amountToMelt = quote.amount + quote.fee_reserve;
@@ -178,7 +173,9 @@ const runWalletExample = async () => {
 			console.log(`Total quote amount: ${amountToMelt}`);
 
 			// in order to get the correct amount of proofs for the melt request, we can use the `send` function we used before
-			const { keep, send } = await wallet.send(amountToMelt, proofs, { includeFees: true });
+			const { keep, send } = await wallet.send(amountToMelt, proofs, {
+				includeFees: true,
+			});
 
 			// once again, we update the proofs we have to keep.
 			proofs = keep;
@@ -200,9 +197,9 @@ const runWalletExample = async () => {
 			// we can check on the status
 			setTimeout(async () => await checkMeltQuote(quote), 1000);
 
-			const checkMeltQuote = async (q: MeltQuoteResponse) => {
+			const checkMeltQuote = async (q: PartialMeltQuoteResponse) => {
 				// we can check on the status of the quote.
-				const quote = await wallet.checkMeltQuote(q.quote);
+				const quote = await wallet.checkMeltQuoteBolt11(q.quote);
 
 				if (quote.error) {
 					console.error(quote.error, quote.code, quote.detail);
@@ -212,7 +209,7 @@ const runWalletExample = async () => {
 					// if the request has succeeded, we should receive the preimage for the paid invoice.
 					console.log(
 						'success! here is the payment preimage (if its null, the mints lightning backend did not forward the preimage): ',
-						quote.payment_preimage
+						quote.payment_preimage,
 					);
 
 					console.log(`Ecash left: ${sumProofs(proofs)}`);
@@ -232,4 +229,6 @@ const runWalletExample = async () => {
 	}
 };
 
-runWalletExample();
+(async () => {
+	await runWalletExample();
+})();

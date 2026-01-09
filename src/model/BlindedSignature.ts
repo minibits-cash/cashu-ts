@@ -1,16 +1,16 @@
-import { ProjPointType } from '@noble/curves/abstract/weierstrass';
-import { SerializedBlindedSignature } from './types/index';
-import { DLEQ } from '@cashu/crypto/modules/common';
+import { type WeierstrassPoint } from '@noble/curves/abstract/weierstrass';
+import { type SerializedBlindedSignature } from './types/index';
+import { type DLEQ } from '../crypto';
 import { bytesToHex } from '@noble/hashes/utils';
 import { numberToHexPadded64 } from '../utils';
 
 class BlindedSignature {
 	id: string;
 	amount: number;
-	C_: ProjPointType<bigint>;
+	C_: WeierstrassPoint<bigint>;
 	dleq?: DLEQ;
 
-	constructor(id: string, amount: number, C_: ProjPointType<bigint>, dleq?: DLEQ) {
+	constructor(id: string, amount: number, C_: WeierstrassPoint<bigint>, dleq?: DLEQ) {
 		this.id = id;
 		this.amount = amount;
 		this.C_ = C_;
@@ -26,9 +26,9 @@ class BlindedSignature {
 				dleq: {
 					s: bytesToHex(this.dleq.s),
 					e: bytesToHex(this.dleq.e),
-					r: numberToHexPadded64(this.dleq.r ?? BigInt(0))
-				}
-			})
+					r: numberToHexPadded64(this.dleq.r ?? BigInt(0)),
+				},
+			}),
 		};
 	}
 }
